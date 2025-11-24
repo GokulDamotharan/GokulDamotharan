@@ -1,4 +1,3 @@
-/* global gapi */
 import React, { useEffect, useState } from "react";
 import "bootstrap";
 import "bootstrap/dist/css/bootstrap.css";
@@ -33,65 +32,32 @@ function App() {
 
 	const [apiLoaded, setApiLoaded] = useState(false);
 
-	// To load only when gapi is loaded
+	// Wait for Google Identity Services to load
 	useEffect(() => {
-		// Function to check if gapi is loaded
-		const checkGapiLoaded = () => {
-			if (window.gapi && window.gapi.load) {
+		// Function to check if Google Identity Services is loaded
+		const checkGoogleLoaded = () => {
+			if (window.google && window.google.accounts && window.google.accounts.id) {
 				return true;
 			}
 			return false;
 		};
 
-		// Function to initialize Google API
-		const initGoogleAPI = () => {
-			setApiLoaded(false);
-			window.gapi.load("client:auth2", initClient);
-			
-			function initClient() {
-				window.gapi.client
-					.init({
-						apiKey: process.env.REACT_APP_API_KEY,
-						clientId: process.env.REACT_APP_CLIENT_ID,
-						discoveryDocs: [process.env.REACT_APP_DISCOVERY_DOCS],
-						scope: process.env.REACT_APP_SCOPE,
-					})
-					.then(
-						function () {
-							const authInstance = window.gapi?.auth2?.getAuthInstance();
-							if (authInstance && authInstance.isSignedIn.get()) {
-								console.log(
-									`Is signed in? ${authInstance.isSignedIn.get()}`
-								);
-							} else {
-								console.log("Currently Logged Out!!");
-							}
-							setApiLoaded(true);
-						},
-						function (error) {
-							console.error(`[Google] Initialization error: ${JSON.stringify(error)}`);
-							// Still set apiLoaded to true so app can render, but Google sign-in won't work
-							setApiLoaded(true);
-						}
-					);
-			}
-		};
-
-		// Check if gapi is already loaded
-		if (checkGapiLoaded()) {
-			initGoogleAPI();
+		// Check if already loaded
+		if (checkGoogleLoaded()) {
+			setApiLoaded(true);
 		} else {
-			// Wait for gapi to load (check every 100ms, max 10 seconds)
+			// Wait for Google Identity Services to load (check every 100ms, max 10 seconds)
 			let attempts = 0;
 			const maxAttempts = 100;
 			const checkInterval = setInterval(() => {
 				attempts++;
-				if (checkGapiLoaded()) {
+				if (checkGoogleLoaded()) {
 					clearInterval(checkInterval);
-					initGoogleAPI();
+					console.log("[Google] Identity Services loaded successfully");
+					setApiLoaded(true);
 				} else if (attempts >= maxAttempts) {
 					clearInterval(checkInterval);
-					console.error("[Google] Failed to load Google API after 10 seconds");
+					console.error("[Google] Failed to load Google Identity Services after 10 seconds");
 					// Set apiLoaded to true anyway so app can render
 					setApiLoaded(true);
 				}
