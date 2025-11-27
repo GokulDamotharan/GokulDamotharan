@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { Link, useLocation, useHistory } from "react-router-dom";
-import { User, Search, Calendar, Clock, LogOut } from "lucide-react";
+import { LayoutDashboard, Calendar, Users, FileText, Settings, LogOut, Sparkles, Activity } from "lucide-react";
 import { AuthContext } from "../Auth/AuthContext";
 import { motion } from "framer-motion";
 
@@ -12,89 +12,93 @@ const LeftsidePatient = () => {
   const isActive = (path) => location.pathname === path;
 
   const menuItems = [
-    { path: "/patient", icon: User, label: "Personal Details" },
-    { path: "/patient/searchdoctor", icon: Search, label: "Search Doctor" },
-    { path: "/patient/appointment-status", icon: Clock, label: "Appointment Status" },
-    { path: "/patient/previousappointments", icon: Calendar, label: "Previous Appointments" },
+    { path: "/patient", icon: LayoutDashboard, label: "Dashboard" },
+    { path: "/patient/appointment-status", icon: Calendar, label: "Appointments" },
+    { path: "/patient/searchdoctor", icon: Users, label: "Find Doctors" },
+    { path: "/patient/previousappointments", icon: FileText, label: "History" },
+    { path: "/patient/ai-assistant", icon: Sparkles, label: "AI Assistant", badge: "New" },
+    { path: "/patient/settings", icon: Settings, label: "Settings" },
   ];
 
   const handleLogout = () => {
-    // Clear localStorage
     localStorage.clear();
-    
-    // Clear auth context
     setToken(null);
     setGoogleId(null);
-    
-    // Redirect to home
     history.push("/");
   };
 
   return (
-    <div className="glass-panel h-100 p-3 d-flex flex-column">
-      <div className="mb-4 px-3 pt-2">
-        <small className="text-uppercase font-weight-bold" style={{ fontSize: '0.75rem', letterSpacing: '1px', color: 'var(--color-text-light)' }}>
-          Patient Portal
+    <div className="glass-panel h-100 p-4 d-flex flex-column">
+      <div className="mb-5 px-2 d-flex align-items-center gap-2">
+        <div className="bg-gradient-primary rounded p-1">
+          <Activity size={20} className="text-white" />
+        </div>
+        <span className="font-weight-bold text-dark h5 m-0">MediSched</span>
+      </div>
+
+      <div className="mb-4 px-3">
+        <small className="text-uppercase font-weight-bold text-secondary" style={{ fontSize: '0.7rem', letterSpacing: '1.5px' }}>
+          Main Menu
         </small>
       </div>
-      <ul className="nav flex-column flex-grow-1">
+
+      <ul className="nav flex-column flex-grow-1 gap-2">
         {menuItems.map((item) => (
-          <li className="nav-item mb-2" key={item.path}>
+          <li className="nav-item" key={item.path}>
             <Link
               to={item.path}
-              className={`nav-link d-flex align-items-center rounded-pill px-3 py-2 ${
-                isActive(item.path) ? 'active-nav-link' : 'inactive-nav-link'
+              className={`nav-link d-flex align-items-center rounded-xl px-3 py-3 position-relative overflow-hidden ${
+                isActive(item.path) ? 'text-primary bg-soft-primary shadow-sm' : 'text-secondary hover-bg-light'
               }`}
               style={{ 
-                transition: 'all 0.2s ease',
-                textDecoration: 'none'
+                transition: 'all 0.3s ease',
+                background: isActive(item.path) ? 'rgba(24, 197, 210, 0.1)' : 'transparent',
+                color: isActive(item.path) ? 'var(--color-teal)' : 'var(--color-text-secondary)'
               }}
             >
-              <item.icon size={18} className="mr-3" />
+              {isActive(item.path) && (
+                <div className="position-absolute" style={{ 
+                  left: 0, top: 0, bottom: 0, width: 4, 
+                  background: 'var(--gradient-primary)',
+                  borderRadius: '0 4px 4px 0'
+                }}></div>
+              )}
+              
+              <item.icon size={20} className="mr-3" style={{ opacity: isActive(item.path) ? 1 : 0.7 }} />
               <span className="font-weight-medium" style={{ fontSize: '0.95rem' }}>
                 {item.label}
               </span>
+              
+              {item.badge && (
+                <span className="ml-auto badge badge-pill bg-gradient-primary text-white" style={{ fontSize: '0.6rem' }}>
+                  {item.badge}
+                </span>
+              )}
             </Link>
           </li>
         ))}
       </ul>
 
       {/* Logout Button */}
-      <div className="px-3 pb-3">
+      <div className="mt-auto pt-4 border-top border-light">
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={handleLogout}
-          className="w-100 d-flex align-items-center justify-content-center gap-2 rounded-pill px-3 py-2"
+          className="w-100 d-flex align-items-center justify-content-center gap-2 rounded-xl px-3 py-3"
           style={{
-            background: 'linear-gradient(135deg, #FF6B6B 0%, #EE5A6F 100%)',
-            color: 'white',
+            background: 'rgba(239, 68, 68, 0.1)',
+            color: 'var(--color-danger)',
             border: 'none',
             cursor: 'pointer',
             fontWeight: '600',
             fontSize: '0.95rem',
-            transition: 'all 0.2s ease',
-            boxShadow: '0 4px 12px rgba(255, 107, 107, 0.3)'
+            transition: 'all 0.2s ease'
           }}
         >
           <LogOut size={18} />
-          Logout
+          Sign Out
         </motion.button>
-      </div>
-
-      <div className="px-3 pb-3">
-        <div className="p-3 rounded" style={{ background: 'var(--color-light-grey)' }}>
-          <small className="d-block mb-1" style={{ color: 'var(--color-text-secondary)' }}>
-            Need Help?
-          </small>
-          <Link 
-            to="/patient/feedback/new" 
-            className="font-weight-bold" 
-            style={{ fontSize: '0.9rem', color: 'var(--color-teal)', textDecoration: 'none' }}
-          >
-            Contact Support
-          </Link>
-        </div>
       </div>
     </div>
   );

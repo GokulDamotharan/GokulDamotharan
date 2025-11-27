@@ -6,6 +6,8 @@ const mongoose = require('mongoose');
 const patientsRouter = require('./routes/patients');
 const doctorsRotuer = require('./routes/doctors');
 const appointmentRouter = require('./routes/appointments');
+const healthTipsRouter = require("./routes/healthTips");
+const questionsRouter = require("./routes/questions");
  
 app.use(express.json());
 app.use(cors(
@@ -19,6 +21,9 @@ app.use(cors(
 app.use('/patients', patientsRouter);
 app.use('/doctors', doctorsRotuer);
 app.use('/appointments', appointmentRouter);
+app.use("/health-tips", healthTipsRouter);
+app.use("/questions", questionsRouter);
+app.use("/ai", require("./routes/ai"));
 
 const port = process.env.PORT || 5001;
 let uri = '';

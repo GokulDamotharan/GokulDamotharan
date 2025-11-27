@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { Link, useLocation, useHistory } from "react-router-dom";
-import { Calendar, User, Clock, LogOut } from "lucide-react";
+import { Calendar, User, Clock, LogOut, FileText, MessageSquare } from "lucide-react";
 import { AuthContext } from "../Auth/AuthContext";
 import { motion } from "framer-motion";
 
@@ -15,6 +15,8 @@ const LeftsideDoctor = () => {
     { path: "/doctor", icon: Calendar, label: "Today's Schedule" },
     { path: "/doctor/perosnaldetails", icon: User, label: "Personal Details" },
     { path: "/doctor/payment-history", icon: Clock, label: "Previous Appointments" },
+    { path: "/doctor/health-tips", icon: FileText, label: "Manage Health Tips" },
+    { path: "/doctor/questions", icon: MessageSquare, label: "Patient Questions" },
   ];
 
   const handleLogout = () => {

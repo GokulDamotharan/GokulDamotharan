@@ -135,6 +135,23 @@ router.route("/login").post(async (req, res) => {
 	}
 });
 
+// Get doctor details by ID
+router.route("/getDoctorDetails/:id").get(async (req, res) => {
+	try {
+		const doctorId = req.params.id;
+		const doctor = await Doctor.findById(doctorId).select('-password'); // Exclude password
+		
+		if (!doctor) {
+			return res.status(404).json({ message: "Doctor not found" });
+		}
+		
+		return res.status(200).json(doctor);
+	} catch (err) {
+		console.log(err);
+		return res.status(400).json(err);
+	}
+});
+
 // To get the slots available for the date
 router.route("/get-slots").post(async (req, res) => {
 	try {

@@ -23,6 +23,10 @@ import DocAppointments from "./Doctor/PaymentHistory";
 import AppointmentStatus from "./Patient/AppointmentStatus";
 import Pfeedback from "./Patient/Feedback";
 import FeedbackDetails from "./Doctor/FeedbackDetails";
+import HealthTipsManager from "./Doctor/HealthTipsManager";
+import QuestionsManager from "./Doctor/QuestionsManager";
+import AiAssistantPage from "./Patient/AiAssistantPage";
+import SettingsPage from "./Patient/SettingsPage";
 
 function App() {
   const [token, setToken] = useState(window.localStorage.getItem("token"));
@@ -76,9 +80,21 @@ function App() {
               path="/doctor/feedback/:id"
               component={FeedbackDetails}
             />
+            <Route
+              exact
+              path="/doctor/health-tips"
+              component={HealthTipsManager}
+            />
+            <Route
+              exact
+              path="/doctor/questions"
+              component={QuestionsManager}
+            />
 
             <Route exact path="/patient/selectdate" component={Selectdate} />
             <Route exact path="/patient/book-slot" component={BookingSlots} />
+            <Route exact path="/patient/ai-assistant" component={AiAssistantPage} />
+            <Route exact path="/patient/settings" component={SettingsPage} />
             <Route exact path="/patient/payment" component={Payment} />
             <Route
               exact
