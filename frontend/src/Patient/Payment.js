@@ -22,9 +22,8 @@ const Payment = (props) => {
   const [finalBalnce, setFinalBalnce] = useState(0);
   const history = useHistory();
 
-  function createEvent(id, dateTime, doctorEmail) {
+  async function createEvent(id, dateTime, doctorEmail) {
     var virtualEvent = {
-      id: id,
       summary: "Appointment",
       location: "Virtual",
       description: "Doctor-Patient appointment",
@@ -41,7 +40,7 @@ const Payment = (props) => {
           requestId: "7qxalsvy0e",
         },
       },
-      attendees: [{ email: doctorEmail }],
+      attendees: doctorEmail ? [{ email: doctorEmail }] : [],
       guestsCanModify: true,
       reminders: {
         useDefault: false,
@@ -52,50 +51,70 @@ const Payment = (props) => {
       },
     };
 
-    var request = window.gapi.client.calendar.events.insert({
-      calendarId: "primary",
-      resource: virtualEvent,
-      sendUpdates: "all",
-      supportsAttachments: true,
-      conferenceDataVersion: 1,
-    });
+    try {
+      const accessToken = localStorage.getItem("token");
+      if (!accessToken) {
+        console.error("No access token found for Calendar API");
+        return;
+      }
 
-    request.execute(function (event) {
-      console.log("Executed!");
+      const response = await axios.post(
+        'https://www.googleapis.com/calendar/v3/calendars/primary/events?conferenceDataVersion=1&sendUpdates=all',
+        virtualEvent,
+        {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      console.log("Event created!", response.data);
 
       // Add meet link
-      if (event) {
-        // console.log(`AddEvent link : ${event.hangoutLink}, Id : ${id}`)
+      if (response.data) {
         axios.put(
           `${process.env.REACT_APP_SERVER_URL}/appointments/add-meet-link`,
           {
             appointmentId: id,
-            meetLink: event.hangoutLink
+            meetLink: response.data.hangoutLink
           }
         ).then((x) => {
           console.log(`Updated Meet Link!`);
         })
       }
-    });
+    } catch (error) {
+      console.error("Error creating calendar event:", error);
+      console.error("Error response:", error.response);
+      toast.error(`Failed to create calendar event: ${error.message}`);
+      if (error.response) {
+        toast.error(`API Error: ${error.response.status} - ${JSON.stringify(error.response.data)}`);
+      }
+    }
   }
 
   const { dateId, doctor, slotId } = props.location.data;
 
   const bookSlot = async () => {
+    const googleId = localStorage.getItem("googleId");
+    if (!googleId) {
+      toast.error("User ID missing. Please logout and login again.");
+      return;
+    }
+
     const { data } = await Axios.post(
       `${process.env.REACT_APP_SERVER_URL}/doctors/book-slot/`,
       {
-        googleId: localStorage.getItem("googleId"),
-        patientName: JSON.parse(localStorage.getItem("user")).name,
+        googleId: googleId,
+        patientName: localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")).name : "Unknown Patient",
         slotId: slotId,
         dateId: dateId,
         doctorId: doctor._id,
       }
     );
 
-    if (data.doctorEmail) {
-      createEvent(data._id, data.date + "T" + data.slotTime, data.doctorEmail);
-    }
+    // Create event even if doctorEmail is missing (it will just not have attendees)
+    createEvent(data._id, data.date + "T" + data.slotTime, data.doctorEmail);
   };
 
   useEffect(() => {

@@ -1,31 +1,34 @@
 import React, { useState, useEffect } from "react";
 import Axios from "axios";
 import jwt_decode from "jwt-decode";
-import Scrollbar from "react-scrollbars-custom";
 import Navbar from "../Basic/Navbar";
-import "../Dashbaord/dashboard.css";
-import StarPicker from 'react-star-picker';
 import Leftside from "../Dashbaord/LeftsideDoctor";
+import StarPicker from 'react-star-picker';
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { Calendar, Clock, User, Star, MessageSquare, AlertCircle } from "lucide-react";
 
 const DocAppointments = () => {
-
-  //   console.log(decoded);
-
-  const [Appointments, setAppointments] = useState([]);
+  const [appointments, setAppointments] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchAppointments = async () => {
-
-    var token = localStorage.getItem("token");
-    var decoded = jwt_decode(token);
-    const { data } = await Axios.post(
-      `${process.env.REACT_APP_SERVER_URL}/doctors/previous-appointments/`,
-      {
-        doctorId: decoded._id,
-      }
-    );
-    // console.log(data);
-    setAppointments(data);
+    try {
+      setIsLoading(true);
+      var token = localStorage.getItem("token");
+      var decoded = jwt_decode(token);
+      const { data } = await Axios.post(
+        `${process.env.REACT_APP_SERVER_URL}/doctors/previous-appointments/`,
+        {
+          doctorId: decoded._id,
+        }
+      );
+      setAppointments(data);
+    } catch (error) {
+      console.error("Error fetching appointments:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -33,53 +36,127 @@ const DocAppointments = () => {
   }, []);
 
   return (
-    <div className="bg-dark" style={{ height: "100vh" }}>
+    <div className="d-flex flex-column min-vh-100">
       <Navbar />
-      <div>
-        <div className="row m-5" style={{ maxWidth: "100%" }}>
-          <div
-            className="col-3 col-md-3 p-4 bg-white "
-            style={{ height: "80vh" }}
-          >
+      <div className="container-fluid flex-grow-1">
+        <div className="row h-100">
+          <div className="col-md-3 col-lg-2 d-none d-md-block p-0">
             <Leftside />
           </div>
-          <div
-            className="col-9 col-md-9 p-3"
-            style={{
-              border: "15px solid yellow ",
-              height: "80vh",
-              backgroundColor: "#6c757d",
-            }}
-          >
-            <Scrollbar
-              noScrollX
-              style={{ position: "", height: "73vh", width: "150vh" }}
-              className="col-12 col-md-12"
+
+          <div className="col-md-9 col-lg-10 p-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
             >
-              <table className="table table-hover table-dark">
-                <thead>
-                  <tr>
-                    <th scope="col">Date</th>
-                    <th scope="col">Time</th>
-                    <th scope="col">Patient Name</th>
-					<th scope="col" style={{textAlign:'center'}}>Feedback</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {Appointments.map((Appointment) => (
-                    <tr>
-                      <th scope="row">{Appointment.date}</th>
-                      <th scope="row">{Appointment.slotTime}</th>
-                      <th scope="row">{Appointment.patientName}</th>
-					  {Appointment.feedback.given ? <th scope="row" style={{display: 'flex', justifyContent: 'space-around', alignItems: 'center'}}>
-						  <StarPicker value={Appointment.feedback.stars} size="20"></StarPicker>
-						  <Link to={`/doctor/feedback/${Appointment._id}`}>Details</Link>
-					  </th> : <th scope="row" style={{display: 'flex', justifyContent: 'space-around', alignItems: 'center'}}>-</th>}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </Scrollbar>
+              {/* Header */}
+              <div className="mb-4">
+                <h2 className="font-weight-bold d-flex align-items-center gap-2" style={{ color: 'var(--color-text-primary)' }}>
+                  <Calendar size={32} style={{ color: 'var(--color-teal)' }} />
+                  Previous Appointments
+                </h2>
+                <p style={{ color: 'var(--color-text-secondary)' }}>
+                  View your appointment history and patient feedback
+                </p>
+              </div>
+
+              {/* Content */}
+              {isLoading ? (
+                <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '400px' }}>
+                  <div className="spinner-border" style={{ color: 'var(--color-teal)' }} role="status">
+                    <span className="sr-only">Loading...</span>
+                  </div>
+                </div>
+              ) : appointments.length === 0 ? (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="glass-panel p-5 text-center"
+                >
+                  <AlertCircle size={64} style={{ color: 'var(--color-text-light)', marginBottom: '1rem' }} />
+                  <h4 style={{ color: 'var(--color-text-primary)' }}>No Previous Appointments</h4>
+                  <p style={{ color: 'var(--color-text-secondary)' }}>
+                    You don't have any completed appointments yet.
+                  </p>
+                </motion.div>
+              ) : (
+                <div className="glass-panel p-4">
+                  <div className="table-responsive">
+                    <table className="table table-hover">
+                      <thead>
+                        <tr style={{ borderBottom: '2px solid var(--color-border-grey)' }}>
+                          <th style={{ color: 'var(--color-text-primary)', fontWeight: '600', padding: '1rem' }}>
+                            <Calendar size={18} className="mr-2" />
+                            Date
+                          </th>
+                          <th style={{ color: 'var(--color-text-primary)', fontWeight: '600', padding: '1rem' }}>
+                            <Clock size={18} className="mr-2" />
+                            Time
+                          </th>
+                          <th style={{ color: 'var(--color-text-primary)', fontWeight: '600', padding: '1rem' }}>
+                            <User size={18} className="mr-2" />
+                            Patient Name
+                          </th>
+                          <th style={{ color: 'var(--color-text-primary)', fontWeight: '600', padding: '1rem' }}>
+                            <MessageSquare size={18} className="mr-2" />
+                            Feedback
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {appointments.map((appointment, index) => (
+                          <motion.tr
+                            key={appointment._id}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: index * 0.1 }}
+                            style={{ borderBottom: '1px solid var(--color-border-grey)' }}
+                          >
+                            <td style={{ padding: '1rem', color: 'var(--color-text-secondary)' }}>
+                              {appointment.date}
+                            </td>
+                            <td style={{ padding: '1rem', color: 'var(--color-text-secondary)' }}>
+                              {appointment.slotTime}
+                            </td>
+                            <td style={{ padding: '1rem', color: 'var(--color-text-primary)', fontWeight: '500' }}>
+                              {appointment.patientName}
+                            </td>
+                            <td style={{ padding: '1rem' }}>
+                              {appointment.feedback.given ? (
+                                <div className="d-flex align-items-center gap-3">
+                                  <div style={{ transform: 'scale(0.8)' }}>
+                                    <StarPicker value={appointment.feedback.stars} size="20" />
+                                  </div>
+                                  <Link 
+                                    to={`/doctor/feedback/${appointment._id}`}
+                                    className="d-flex align-items-center gap-2"
+                                    style={{ 
+                                      color: 'var(--color-teal)', 
+                                      textDecoration: 'none',
+                                      fontSize: '0.9rem',
+                                      fontWeight: '500',
+                                      transition: 'all 0.2s'
+                                    }}
+                                    onMouseEnter={(e) => e.currentTarget.style.color = 'var(--color-sky-blue)'}
+                                    onMouseLeave={(e) => e.currentTarget.style.color = 'var(--color-teal)'}
+                                  >
+                                    <MessageSquare size={16} />
+                                    View Details
+                                  </Link>
+                                </div>
+                              ) : (
+                                <span style={{ color: 'var(--color-text-light)' }}>No feedback</span>
+                              )}
+                            </td>
+                          </motion.tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </motion.div>
           </div>
         </div>
       </div>

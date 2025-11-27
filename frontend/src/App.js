@@ -21,97 +21,80 @@ import BookingSlots from "./Doctor/BookingSlots";
 import Payment from "./Patient/Payment";
 import DocAppointments from "./Doctor/PaymentHistory";
 import AppointmentStatus from "./Patient/AppointmentStatus";
-import Pfeedback from './Patient/Feedback';
-import FeedbackDetails from './Doctor/FeedbackDetails';
+import Pfeedback from "./Patient/Feedback";
+import FeedbackDetails from "./Doctor/FeedbackDetails";
 
 function App() {
-	const [token, setToken] = useState(window.localStorage.getItem("token"));
-	const [googleId, setGoogleId] = useState(
-		window.localStorage.getItem("googleId")
-	);
+  const [token, setToken] = useState(window.localStorage.getItem("token"));
+  const [googleId, setGoogleId] = useState(
+    window.localStorage.getItem("googleId")
+  );
 
-	const [apiLoaded, setApiLoaded] = useState(false);
+  return (
+    <Router>
+      <AuthContext.Provider value={{ token, setToken, googleId, setGoogleId }}>
+        <div className="min-vh-100 d-flex flex-column position-relative">
+          <div className="fixed-background" style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            zIndex: -1,
+            background: 'linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%)'
+          }}></div>
 
-	// Wait for Google Identity Services to load
-	useEffect(() => {
-		// Function to check if Google Identity Services is loaded
-		const checkGoogleLoaded = () => {
-			if (window.google && window.google.accounts && window.google.accounts.id) {
-				return true;
-			}
-			return false;
-		};
+          {/* We can include Navbar here if we want it global, but Home.js has its own Navbar. 
+              Let's remove Navbar from individual pages and put it here if possible, 
+              or just provide the background wrapper. 
+              For now, just the background wrapper to ensure consistency. */}
 
-		// Check if already loaded
-		if (checkGoogleLoaded()) {
-			setApiLoaded(true);
-		} else {
-			// Wait for Google Identity Services to load (check every 100ms, max 10 seconds)
-			let attempts = 0;
-			const maxAttempts = 100;
-			const checkInterval = setInterval(() => {
-				attempts++;
-				if (checkGoogleLoaded()) {
-					clearInterval(checkInterval);
-					console.log("[Google] Identity Services loaded successfully");
-					setApiLoaded(true);
-				} else if (attempts >= maxAttempts) {
-					clearInterval(checkInterval);
-					console.error("[Google] Failed to load Google Identity Services after 10 seconds");
-					// Set apiLoaded to true anyway so app can render
-					setApiLoaded(true);
-				}
-			}, 100);
-		}
+          <Switch>
+            <Route exact path="/" component={Home} />
+            <Route exact path="/doctorlogin" component={DoctorLogin} />
+            <Route exact path="/doctor" component={DoctorDashboard} />
+            <Route exact path="/patient/searchdoctor" component={SearchDoctor} />
+            <Route exact path="/patient" component={PaitentDashboard} />
+            <Route exact path="/patient/update-phone" component={PhoneNumber} />
+            <Route
+              exact
+              path="/patient/previousappointments"
+              component={PerviousAppointments}
+            />
+            <Route
+              exact
+              path="/doctor/perosnaldetails"
+              component={PersonalDetails}
+            />
+            <Route
+              exact
+              path="/doctor/payment-history"
+              component={DocAppointments}
+            />
+            <Route
+              exact
+              path="/doctor/feedback/:id"
+              component={FeedbackDetails}
+            />
 
-	}, []);
+            <Route exact path="/patient/selectdate" component={Selectdate} />
+            <Route exact path="/patient/book-slot" component={BookingSlots} />
+            <Route exact path="/patient/payment" component={Payment} />
+            <Route
+              exact
+              path="/patient/appointment-status"
+              component={AppointmentStatus}
+            />
+            <Route exact path="/patient/feedback/:id" component={Pfeedback} />
 
-	return apiLoaded ? (
-		<Router>
-			<AuthContext.Provider value={{ token, setToken, googleId, setGoogleId }}>
-				<Switch>
-					<Route exact path="/" component={Home} />
-					<Route exact path="/doctorlogin" component={DoctorLogin} />
-					<Route exact path="/doctor" component={DoctorDashboard} />
-					<Route exact path="/patient/searchdoctor" component={SearchDoctor} />
-					<Route exact path="/patient" component={PaitentDashboard} />
-					<Route exact path="/patient/update-phone" component={PhoneNumber} />
-					<Route
-						exact
-						path="/patient/previousappointments"
-						component={PerviousAppointments}
-					/>
-					<Route
-						exact
-						path="/doctor/perosnaldetails"
-						component={PersonalDetails}
-					/>
-					<Route
-						exact
-						path="/doctor/payment-history"
-						component={DocAppointments}
-					/>
-					<Route exact path="/doctor/feedback/:id" component={FeedbackDetails} />
-
-					<Route exact path="/patient/selectdate" component={Selectdate} />
-					<Route exact path="/patient/book-slot" component={BookingSlots} />
-					<Route exact path="/patient/payment" component={Payment} />
-					<Route exact path="/patient/appointment-status" component={AppointmentStatus} />
-					<Route exact path="/patient/feedback/:id" component={Pfeedback} />
-
-					<Route path="*">
-						<Error />
-					</Route>
-				</Switch>
-			</AuthContext.Provider>
-		</Router>
-	) : (
-		<div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
-			<Spinner animation="border" variant="danger" role="status">
-				<span className="sr-only">Loading...</span>
-			</Spinner>
-		</div>
-	);
+            <Route path="*">
+              <Error />
+            </Route>
+          </Switch>
+        </div>
+      </AuthContext.Provider>
+    </Router>
+  );
 }
 
 export default App;

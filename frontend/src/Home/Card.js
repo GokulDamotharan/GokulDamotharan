@@ -1,95 +1,165 @@
 import { Button } from 'react-bootstrap';
 import React, { useContext } from 'react';
-// import GoogleLogin from 'react-google-login';
+import { useGoogleLogin } from '@react-oauth/google';
 import { Link, useHistory } from "react-router-dom";
 import { AuthContext } from '../Auth/AuthContext';
+import { motion } from 'framer-motion';
+import { User, Stethoscope, ArrowRight } from 'lucide-react';
 import axios from 'axios';
 
 const Card = ({ login = "Doctor", Image, link }) => {
   const { token, googleId, setToken, setGoogleId } = useContext(AuthContext);
   const history = useHistory();
 
-  async function loginWithGoogle(e) {
-    try {
-      // Check if Google API is loaded and initialized
-      if (!window.gapi || !window.gapi.auth2) {
-        console.error("[Google] Google API is not loaded yet. Please wait...");
-        alert("Google sign-in is still loading. Please wait a moment and try again.");
-        return;
-      }
+  const loginWithGoogle = useGoogleLogin({
+    scope: 'https://www.googleapis.com/auth/calendar',
+    onSuccess: async (tokenResponse) => {
+      try {
+        const userInfo = await axios.get(
+          'https://www.googleapis.com/oauth2/v3/userinfo',
+          { headers: { Authorization: `Bearer ${tokenResponse.access_token}` } }
+        );
 
-      const authInstance = window.gapi.auth2.getAuthInstance();
-      if (!authInstance) {
-        console.error("[Google] Auth instance is not initialized yet.");
-        alert("Google sign-in is still initializing. Please wait a moment and try again.");
-        return;
-      }
+        const profile = userInfo.data;
+        console.log("[Google] Signed in successfully!", profile);
 
-      // Sign in with Google
-      await authInstance.signIn();
-      
-      // Get the auth instance again after sign in
-      const auth2 = window.gapi.auth2.getAuthInstance();
-      
-      if (auth2 && auth2.isSignedIn.get()) {
-        console.log("[Google] Signed in successfully!");
-        var profile = auth2.currentUser.get();
-        console.log(profile);
-        
-        if (!profile || !profile.getAuthResponse || !profile.getId) {
-          throw new Error("Failed to get user profile from Google");
-        }
-        
-        window.localStorage.setItem("token", profile.getAuthResponse().id_token);
-        window.localStorage.setItem("googleId", profile.getId());
+        window.localStorage.setItem("token", tokenResponse.access_token);
+        window.localStorage.setItem("googleId", profile.sub);
+        window.localStorage.setItem("user", JSON.stringify(profile));
 
         const serverRes = await axios.post(
           `${process.env.REACT_APP_SERVER_URL}/patients/google-login/`,
           {
-            tokenId: profile.getAuthResponse().id_token,
+            googleId: profile.sub,
+            email: profile.email,
+            name: profile.name,
+            picture: profile.picture
           }
         );
 
         if (serverRes) {
           console.log(serverRes.data.phoneNumberExists);
 
-          setToken(profile.getAuthResponse().id_token);
-          setGoogleId(profile.getId());
+          setToken(tokenResponse.access_token);
+          setGoogleId(profile.sub);
 
           if (serverRes.data.phoneNumberExists === true) {
             history.push("/patient");
           } else {
             history.push("/patient/update-phone");
           }
-        }
-        else {
-          const err = {err : "Server Didn't respond"}
+        } else {
+          const err = { err: "Server Didn't respond" };
           throw err;
         }
-      } else {
-        console.log("[Google] Sign in was cancelled or failed.");
-      }
-    } catch (err) {
-      console.error(`[Google] Some error occurred while signing in!`, err);
-      if (err.error === 'popup_closed_by_user') {
-        alert("Sign-in was cancelled. Please try again.");
-      } else {
+      } catch (err) {
+        console.error(`[Google] Some error occurred while signing in!`, err);
         alert(`Error signing in: ${err.message || JSON.stringify(err)}`);
       }
-    }
-  }
+    },
+    onError: (error) => {
+      console.error(`[Google] Login Failed:`, error);
+      alert(`Google Login Failed: ${error}`);
+    },
+  });
+
+  const icon = login === "Doctor" ? <Stethoscope size={28} /> : <User size={28} />;
+  const gradient = login === "Doctor" 
+    ? "var(--gradient-secondary)" 
+    : "var(--gradient-primary)";
 
   return (
-    <div className="card mb-3" style={{ width: "18rem" }}>
-      <img src={Image} className="card-img-top" alt="..." height="240" />
-      <div className="card-body">
-        {((!token || googleId) && login === "Doctor") && <Link to={link} className="btn btn-primary justify-content-center w-100">Login As A Doctor</Link>}
-        {((token && !googleId) && login === "Doctor") && <Link to={link} className="btn btn-primary justify-content-center w-100">My Dashboard</Link>}
-        {((!googleId && login === "Patient") && <Button onClick={loginWithGoogle} disabled={false} className="btn btn-primary justify-content-center w-100">Login As A Patient</Button>)}
-        {((token && googleId) && login === "Patient") && <Link to={link} className="btn btn-primary justify-content-center w-100">My Dashboard</Link>}
+    <motion.div
+      whileHover={{ y: -8, scale: 1.02 }}
+      transition={{ duration: 0.3 }}
+      className="glass-panel p-4 h-100"
+      style={{ cursor: 'pointer' }}
+    >
+      {/* Icon Header */}
+      <div className="d-flex justify-content-center mb-4">
+        <div 
+          className="icon-container-lg"
+          style={{ background: gradient }}
+        >
+          {icon}
+        </div>
       </div>
-    </div>
-  )
+
+      {/* Image */}
+      <div className="mb-4" style={{ overflow: 'hidden', borderRadius: 'var(--radius-lg)' }}>
+        <motion.img 
+          whileHover={{ scale: 1.05 }}
+          transition={{ duration: 0.4 }}
+          src={Image} 
+          className="w-100" 
+          alt={login}
+          style={{ 
+            height: "200px", 
+            objectFit: "cover",
+            borderRadius: 'var(--radius-lg)'
+          }}
+        />
+      </div>
+
+      {/* Title */}
+      <h5 className="font-weight-bold mb-3 text-center" style={{ color: 'var(--color-text-primary)' }}>
+        {login} Portal
+      </h5>
+
+      {/* Login Button */}
+      {((!token || googleId) && login === "Doctor") && (
+        <Link to={link} className="text-decoration-none">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="btn-gradient-secondary w-100 d-flex align-items-center justify-content-center gap-2"
+          >
+            Login As A Doctor
+            <ArrowRight size={18} />
+          </motion.button>
+        </Link>
+      )}
+      
+      {((token && !googleId) && login === "Doctor") && (
+        <Link to={link} className="text-decoration-none">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="btn-gradient-secondary w-100 d-flex align-items-center justify-content-center gap-2"
+          >
+            My Dashboard
+            <ArrowRight size={18} />
+          </motion.button>
+        </Link>
+      )}
+
+      {(!googleId && login === "Patient") && (
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={loginWithGoogle}
+          disabled={false}
+          className="btn-gradient-primary w-100 d-flex align-items-center justify-content-center gap-2 ripple"
+        >
+          Login With Google
+          <ArrowRight size={18} />
+        </motion.button>
+      )}
+      
+      {((token && googleId) && login === "Patient") && (
+        <Link to={link} className="text-decoration-none">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="btn-gradient-primary w-100 d-flex align-items-center justify-content-center gap-2"
+          >
+            My Dashboard
+            <ArrowRight size={18} />
+          </motion.button>
+        </Link>
+      )}
+    </motion.div>
+  );
 }
 
 export default Card;

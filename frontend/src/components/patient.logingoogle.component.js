@@ -10,6 +10,7 @@ function LoginGoogle() {
         console.log(response);
         window.localStorage.setItem("googleId", response.googleId);
         window.localStorage.setItem("token", response.tokenId)
+        window.localStorage.setItem("user", JSON.stringify(response.profileObj));
         setIsLoggedIn(true);
     }
 
@@ -26,7 +27,7 @@ function LoginGoogle() {
     return (
         <div>
             {!isLoggedIn && <GoogleLogin
-                clientId="365803515308-boj1rpek38kabo6pm4448b869efoe47q.apps.googleusercontent.com"
+                clientId="18076221050-jb7vnepph67lhvfi5fbq8am9htpe1pi3.apps.googleusercontent.com"
                 buttonText="Login"
                 onSuccess={successResponse}
                 onFailure={failureResponse}

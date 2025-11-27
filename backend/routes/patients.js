@@ -52,23 +52,43 @@ router.route('/update-phone').put((req, res) => {
 
 router.route('/google-login').post(async (req, res) => {
     try {
-        const tokenId = req.body.tokenId;
+        console.log('[google-login] Received request body:', req.body);
+        let googleId, email, name, picture;
 
-        // Decode the jwt
-        const decoded = jwt.decode(tokenId, process.env.KEY);
-        const googleId = await decoded.sub;
+        // Check if we received a tokenId (legacy) or direct profile data (new flow)
+        if (req.body.tokenId) {
+            console.log('[google-login] Using legacy tokenId flow');
+            const tokenId = req.body.tokenId;
+            // Decode the jwt
+            const decoded = jwt.decode(tokenId, process.env.KEY);
+            googleId = await decoded.sub;
+            email = decoded.email;
+            name = decoded.name;
+            picture = decoded.picture;
+        } else {
+            console.log('[google-login] Using new direct profile flow');
+            // New flow - direct profile data
+            googleId = req.body.googleId;
+            email = req.body.email;
+            name = req.body.name;
+            picture = req.body.picture;
+        }
+
+        console.log('[google-login] Extracted data:', { googleId, email, name, picture });
 
         // Check if the user already exists in the database
         const patient = await Patient.findOne({ googleId: googleId });
+        console.log('[google-login] Patient found:', patient ? 'Yes' : 'No');
 
         // If the patient is not found
         if (patient === null) {
-            const { email, name, picture } = decoded;
+            console.log('[google-login] Creating new patient');
             const newPatient = new Patient({
                 googleId, email, name, picture
             })
             const savedPromise = await newPatient.save();
             if (savedPromise) {
+                console.log('[google-login] New patient saved successfully');
                 return res.status(200).json({ phoneNumberExists: false });
             }
             else {
@@ -78,17 +98,21 @@ router.route('/google-login').post(async (req, res) => {
 
         // If the phone number is not present in the database
         else if (patient.phoneNumber === undefined) {
+            console.log('[google-login] Patient exists but no phone number');
             return res.status(200).json({ phoneNumberExists: false });
         }
 
         // Patient's phone number already exists in the database
         else {
+            console.log('[google-login] Patient exists with phone number');
             return res.status(200).json({ phoneNumberExists: true })
         }
     }
     catch (err) {
-        console.log(err);
-        return res.status(400).json(err);
+        console.error('[google-login] ERROR:', err);
+        console.error('[google-login] Error message:', err.message);
+        console.error('[google-login] Error stack:', err.stack);
+        return res.status(400).json({ error: err.message, details: err.toString() });
     }
 })
 

@@ -48,6 +48,7 @@ router.route("/add").post(async (req, res) => {
 		const phoneNumber = req.body.phoneNumber;
 		const specialization = req.body.specialization;
 		const feesPerSession = req.body.feesPerSession;
+        const email = req.body.email;
 
 		// Hash the password before storing
 		const passwordSalt = process.env.PASSWORD_SALT;
@@ -60,6 +61,7 @@ router.route("/add").post(async (req, res) => {
 			phoneNumber,
 			specialization,
 			feesPerSession,
+            email
 		});
 
 		await newDoctor.save();

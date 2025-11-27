@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const app = express();
 const cors = require('cors');
@@ -5,12 +6,11 @@ const mongoose = require('mongoose');
 const patientsRouter = require('./routes/patients');
 const doctorsRotuer = require('./routes/doctors');
 const appointmentRouter = require('./routes/appointments');
-require('dotenv').config();
  
 app.use(express.json());
 app.use(cors(
     {
-        origin: "*", // allow the server to accept request from different origin
+        origin: "http://localhost:3000", // allow the server to accept request from different origin
         methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
         credentials: true // allow session cookie from browser to pass through
     }

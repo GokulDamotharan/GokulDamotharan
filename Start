@@ -1,0 +1,19 @@
+🏥 Starting Healthcare Appointment Scheduling App...
+Now using node v16.20.2 (npm v8.19.4)
+✅ Using Node.js v16.20.2
+🚀 Starting Backend on port 5001...
+
+> backend@1.0.0 start
+> node server.js
+
+🚀 Starting Frontend on port 3000...
+✅ Both services are starting...
+📱 Frontend: http://localhost:3000
+🔧 Backend: http://localhost:5001
+
+Press Ctrl+C to stop both services
+
+> frontend@0.1.0 start
+> react-scripts start
+
+Something is already running on port 3000.
