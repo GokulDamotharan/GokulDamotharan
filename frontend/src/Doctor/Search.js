@@ -3,7 +3,13 @@ import Axios from "axios";
 import Trie from "./Trie.js";
 import specialization from "./specialization";
 import { Link } from "react-router-dom";
-import { Search as SearchIcon, User, Phone, DollarSign, ArrowRight } from "lucide-react";
+import {
+  Search as SearchIcon,
+  User,
+  Phone,
+  DollarSign,
+  ArrowRight,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const Search = () => {
@@ -22,7 +28,9 @@ const Search = () => {
 
   const fetchDoctors = async () => {
     try {
-      const { data } = await Axios.get(`${process.env.REACT_APP_SERVER_URL}/doctors/`);
+      const { data } = await Axios.get(
+        `${process.env.REACT_APP_SERVER_URL}/doctors/`
+      );
       setDoctors(data);
       setFilteredDoctors(data);
     } catch (err) {
@@ -57,7 +65,8 @@ const Search = () => {
       return;
     }
     const filtered = doctors.filter(
-      (doctor) => doctor.specialization.toLowerCase() === searchText.toLowerCase()
+      (doctor) =>
+        doctor.specialization.toLowerCase() === searchText.toLowerCase()
     );
     setFilteredDoctors(filtered);
   };
@@ -77,7 +86,7 @@ const Search = () => {
             placeholder="Search by specialization (e.g., Cardiologist)"
             value={text}
             onChange={onTextChanged}
-            style={{ boxShadow: 'none' }}
+            style={{ boxShadow: "none" }}
           />
           <div className="input-group-append">
             <button
@@ -94,14 +103,14 @@ const Search = () => {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             className="list-group position-absolute w-100 shadow-lg mt-2 rounded-lg overflow-hidden"
-            style={{ zIndex: 1000, top: '100%' }}
+            style={{ zIndex: 1000, top: "100%" }}
           >
             {suggestions.map((item) => (
               <li
                 className="list-group-item list-group-item-action cursor-pointer border-0"
                 onClick={() => suggestionSelected(item)}
                 key={item}
-                style={{ cursor: 'pointer' }}
+                style={{ cursor: "pointer" }}
               >
                 {item}
               </li>
@@ -127,7 +136,9 @@ const Search = () => {
                       <User className="text-primary" size={24} />
                     </div>
                     <div>
-                      <h5 className="font-weight-bold mb-0 text-primary text-uppercase">{doc.name}</h5>
+                      <h5 className="font-weight-bold mb-0 text-primary text-uppercase">
+                        {doc.name}
+                      </h5>
                       <span className="badge badge-pill badge-primary bg-primary-gradient border-0 px-3 py-1 mt-1">
                         {doc.specialization}
                       </span>
@@ -146,7 +157,10 @@ const Search = () => {
                   </div>
 
                   <Link
-                    to={{ pathname: "/patient/selectdate", doctor: { doctor: doc } }}
+                    to={{
+                      pathname: "/patient/selectdate",
+                      doctor: { doctor: doc },
+                    }}
                     className="btn btn-outline-primary rounded-pill w-100 d-flex align-items-center justify-content-center group-hover-text-white"
                   >
                     Book Appointment <ArrowRight size={16} className="ml-2" />
@@ -158,7 +172,9 @@ const Search = () => {
 
           {filteredDoctors.length === 0 && (
             <div className="col-12 text-center py-5">
-              <p className="text-muted">No doctors found matching your criteria.</p>
+              <p className="text-muted">
+                No doctors found matching your criteria.
+              </p>
             </div>
           )}
         </div>
