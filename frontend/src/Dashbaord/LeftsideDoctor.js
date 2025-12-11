@@ -13,6 +13,7 @@ const LeftsideDoctor = () => {
 
   const menuItems = [
     { path: "/doctor", icon: Calendar, label: "Today's Schedule" },
+    { path: "/doctor/manage-slots", icon: Clock, label: "Manage Slots" },
     { path: "/doctor/perosnaldetails", icon: User, label: "Personal Details" },
     { path: "/doctor/payment-history", icon: Clock, label: "Previous Appointments" },
     { path: "/doctor/health-tips", icon: FileText, label: "Manage Health Tips" },

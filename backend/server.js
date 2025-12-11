@@ -10,13 +10,20 @@ const healthTipsRouter = require("./routes/healthTips");
 const questionsRouter = require("./routes/questions");
  
 app.use(express.json());
-app.use(cors(
-    {
-        origin: "http://localhost:3000", // allow the server to accept request from different origin
-        methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-        credentials: true // allow session cookie from browser to pass through
-    }
-));
+
+// Enhanced CORS configuration to handle preflight requests
+const corsOptions = {
+    origin: "http://localhost:3000", // allow the server to accept request from different origin
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
+    credentials: true, // allow session cookie from browser to pass through
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+};
+
+app.use(cors(corsOptions));
+
+// Explicitly handle preflight requests
+app.options('*', cors(corsOptions));
 
 app.use('/patients', patientsRouter);
 app.use('/doctors', doctorsRotuer);

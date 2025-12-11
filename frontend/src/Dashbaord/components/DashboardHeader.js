@@ -14,7 +14,7 @@ const DashboardHeader = () => {
           <div className="bg-white rounded-circle p-2 shadow-sm d-flex align-items-center justify-content-center" style={{ width: 40, height: 40 }}>
             <span style={{ fontSize: 20 }}>🏥</span>
           </div>
-          <h4 className="font-weight-bold m-0 text-dark" style={{ letterSpacing: '-0.5px' }}>MediSched</h4>
+          <h4 className="font-weight-bold m-0 text-dark" style={{ letterSpacing: '-0.5px' }}>Medisched - Intelligent Healthcare Appointment Scheduling System</h4>
         </div>
         <p className="text-secondary small mb-0 font-weight-medium" style={{ letterSpacing: '1px' }}>AI HEALTH COMMAND CENTER</p>
       </div>

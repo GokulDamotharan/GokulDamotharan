@@ -25,8 +25,12 @@ import Pfeedback from "./Patient/Feedback";
 import FeedbackDetails from "./Doctor/FeedbackDetails";
 import HealthTipsManager from "./Doctor/HealthTipsManager";
 import QuestionsManager from "./Doctor/QuestionsManager";
+import TimeSlotManager from "./Doctor/TimeSlotManager";
 import AiAssistantPage from "./Patient/AiAssistantPage";
 import SettingsPage from "./Patient/SettingsPage";
+import DoctorRegistration from "./Doctor/DoctorRegistration";
+import ForgotPassword from "./Doctor/ForgotPassword";
+import ResetPassword from "./Doctor/ResetPassword";
 
 function App() {
   const [token, setToken] = useState(window.localStorage.getItem("token"));
@@ -56,6 +60,9 @@ function App() {
           <Switch>
             <Route exact path="/" component={Home} />
             <Route exact path="/doctorlogin" component={DoctorLogin} />
+            <Route exact path="/doctor/register" component={DoctorRegistration} />
+            <Route exact path="/doctor/forgot-password" component={ForgotPassword} />
+            <Route exact path="/doctor/reset-password" component={ResetPassword} />
             <Route exact path="/doctor" component={DoctorDashboard} />
             <Route exact path="/patient/searchdoctor" component={SearchDoctor} />
             <Route exact path="/patient" component={PaitentDashboard} />
@@ -90,6 +97,11 @@ function App() {
               path="/doctor/questions"
               component={QuestionsManager}
             />
+            <Route
+              exact
+              path="/doctor/manage-slots"
+              component={TimeSlotManager}
+            />
 
             <Route exact path="/patient/selectdate" component={Selectdate} />
             <Route exact path="/patient/book-slot" component={BookingSlots} />
@@ -114,3 +126,4 @@ function App() {
 }
 
 export default App;
+

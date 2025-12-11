@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Axios from "axios";
-import Navbar from "../Basic/Navbar";
 import Leftside from "../Dashbaord/LeftsidePatient";
+import DashboardHeader from "../Dashbaord/components/DashboardHeader";
 import { motion } from "framer-motion";
 import { Calendar, Clock, Video, AlertCircle } from "lucide-react";
 
@@ -32,20 +32,18 @@ const AppointmentStatus = () => {
     }, []);
 
     return (
-        <div className="d-flex flex-column min-vh-100">
-            <Navbar />
-            <div className="container-fluid flex-grow-1">
-                <div className="row h-100">
-                    <div className="col-md-3 col-lg-2 d-none d-md-block p-0">
+        <div className="d-flex flex-column min-vh-100 bg-light">
+            <div className="container-fluid flex-grow-1 p-0">
+                <div className="row h-100 no-gutters">
+                    <div className="col-md-3 col-lg-2 d-none d-md-block p-3 sticky-top vh-100">
                         <Leftside />
                     </div>
 
-                    <div className="col-md-9 col-lg-10 p-4">
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5 }}
-                        >
+                    <div className="col-md-9 col-lg-10 p-4 overflow-auto" style={{ height: '100vh' }}>
+                        {/* Header */}
+                        <DashboardHeader />
+                        
+                        <div>
                             {/* Header */}
                             <div className="mb-4">
                                 <h2 className="font-weight-bold d-flex align-items-center gap-2" style={{ color: 'var(--color-text-primary)' }}>
@@ -144,7 +142,7 @@ const AppointmentStatus = () => {
                                     </div>
                                 </div>
                             )}
-                        </motion.div>
+                        </div>
                     </div>
                 </div>
             </div>

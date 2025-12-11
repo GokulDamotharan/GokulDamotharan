@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Send, Bot, User, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Axios from 'axios';
-import Navbar from '../Basic/Navbar';
 import Leftside from '../Dashbaord/LeftsidePatient';
+import DashboardHeader from '../Dashbaord/components/DashboardHeader';
 
 const AiAssistantPage = () => {
   const [messages, setMessages] = useState([
@@ -49,19 +49,16 @@ const AiAssistantPage = () => {
 
   return (
     <div className="d-flex flex-column min-vh-100 bg-light">
-      <Navbar />
-      <div className="container-fluid flex-grow-1">
-        <div className="row h-100">
-          <div className="col-md-3 col-lg-2 d-none d-md-block p-0">
+      <div className="container-fluid flex-grow-1 p-0">
+        <div className="row h-100 no-gutters">
+          <div className="col-md-3 col-lg-2 d-none d-md-block p-3 sticky-top vh-100">
             <Leftside />
           </div>
-          <div className="col-md-9 col-lg-10 p-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="glass-panel p-4 h-100 d-flex flex-column"
-              style={{ maxHeight: 'calc(100vh - 120px)' }}
-            >
+          <div className="col-md-9 col-lg-10 p-4 overflow-auto" style={{ height: '100vh' }}>
+            {/* Header */}
+            <DashboardHeader />
+            
+            <div className="glass-panel p-4 d-flex flex-column" style={{ height: 'calc(100vh - 180px)' }}>
               {/* Header */}
               <div className="d-flex align-items-center mb-4 pb-3 border-bottom">
                 <div className="bg-primary-gradient rounded-circle p-3 mr-3 text-white">
@@ -150,7 +147,7 @@ const AiAssistantPage = () => {
                   </div>
                 </div>
               </form>
-            </motion.div>
+            </div>
           </div>
         </div>
       </div>

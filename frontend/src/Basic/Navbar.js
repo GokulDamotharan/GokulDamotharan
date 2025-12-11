@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { Link, useHistory } from "react-router-dom";
-import { Sparkles } from "lucide-react";
+import { Sparkles, UserPlus } from "lucide-react";
 import { motion } from "framer-motion";
 import { AuthContext } from "../Auth/AuthContext";
 
@@ -65,22 +65,43 @@ const Navbar = () => {
 
           <div className="d-flex gap-2 align-items-center">
             {!token && !googleId && (
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <button
-                  onClick={handleScrollToLogin}
-                  className="btn-gradient-primary d-flex align-items-center gap-2"
-                  style={{
-                    fontSize: "0.9rem",
-                    border: "none",
-                    cursor: "pointer",
-                  }}
+              <>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  <span>Get Started</span>
-                </button>
-              </motion.div>
+                  <Link
+                    to="/doctor/register"
+                    className="btn-gradient-secondary d-flex align-items-center gap-2"
+                    style={{
+                      fontSize: "0.9rem",
+                      border: "none",
+                      cursor: "pointer",
+                      textDecoration: "none"
+                    }}
+                  >
+                    <UserPlus size={18} />
+                    <span>Doctor Registration</span>
+                  </Link>
+                </motion.div>
+                
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <button
+                    onClick={handleScrollToLogin}
+                    className="btn-gradient-primary d-flex align-items-center gap-2"
+                    style={{
+                      fontSize: "0.9rem",
+                      border: "none",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <span>Get Started</span>
+                  </button>
+                </motion.div>
+              </>
             )}
           </div>
         </div>
@@ -90,3 +111,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+

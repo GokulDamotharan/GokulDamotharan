@@ -57,6 +57,21 @@ const appointmentSchema = new Schema({
     googleMeetLink : {
         type : String
     },
+    status: {
+        type: String,
+        enum: ['scheduled', 'completed', 'cancelled'],
+        default: 'scheduled'
+    },
+    cancellationReason: {
+        type: String
+    },
+    cancelledBy: {
+        type: String,
+        enum: ['doctor', 'patient']
+    },
+    cancelledAt: {
+        type: Date
+    },
     feedback : feedback
 });
 

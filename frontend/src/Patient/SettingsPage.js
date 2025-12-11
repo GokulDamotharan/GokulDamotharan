@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Settings as SettingsIcon, Save, RotateCcw, Eye, EyeOff } from 'lucide-react';
 import { motion } from 'framer-motion';
-import Navbar from '../Basic/Navbar';
 import Leftside from '../Dashbaord/LeftsidePatient';
+import DashboardHeader from '../Dashbaord/components/DashboardHeader';
 
 const SettingsPage = () => {
   const [dashboardSettings, setDashboardSettings] = useState({
@@ -66,18 +66,16 @@ const SettingsPage = () => {
 
   return (
     <div className="d-flex flex-column min-vh-100 bg-light">
-      <Navbar />
-      <div className="container-fluid flex-grow-1">
-        <div className="row h-100">
-          <div className="col-md-3 col-lg-2 d-none d-md-block p-0">
+      <div className="container-fluid flex-grow-1 p-0">
+        <div className="row h-100 no-gutters">
+          <div className="col-md-3 col-lg-2 d-none d-md-block p-3 sticky-top vh-100">
             <Leftside />
           </div>
-          <div className="col-md-9 col-lg-10 p-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="glass-panel p-4"
-            >
+          <div className="col-md-9 col-lg-10 p-4 overflow-auto" style={{ height: '100vh' }}>
+            {/* Header */}
+            <DashboardHeader />
+            
+            <div className="glass-panel p-4">
               {/* Header */}
               <div className="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom">
                 <div className="d-flex align-items-center">
@@ -164,7 +162,7 @@ const SettingsPage = () => {
                   <strong>Note:</strong> Changes will take effect on your dashboard after saving. Navigate to the Dashboard to see your customized layout.
                 </p>
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
       </div>

@@ -9,6 +9,16 @@ const slotSchema = new Schema({
     isBooked : {
         type: Boolean,
         default: false
+    },
+    isAvailable : {
+        type: Boolean,
+        default: true
+    },
+    patientId: {
+        type: String
+    },
+    patientName: {
+        type: String
     }
 })
 
@@ -20,6 +30,7 @@ const dateSchedule = new Schema({
 })
 
 const doctorSchema = new Schema({
+    // Authentication
     username: {
         type: String,
         required: true,
@@ -29,22 +40,109 @@ const doctorSchema = new Schema({
         type: String,
         required: true
     },
+    
+    // Basic Information
     name: {
         type: String
     },
     email : {
         type: String,
-        required: true
+        required: true,
+        unique: true,
+        lowercase: true,
+        trim: true
     },
     phoneNumber: {
-        type: String
+        type: String,
+        unique: true,
+        sparse: true
     },
+    
+    // Personal Details
+    dateOfBirth: {
+        type: Date
+    },
+    gender: {
+        type: String,
+        enum: ['Male', 'Female', 'Other', '']
+    },
+    address: {
+        street: String,
+        city: String,
+        state: String,
+        country: String,
+        postalCode: String
+    },
+    
+    // Location Information (for location-based search)
+    location: {
+        city: String,
+        state: String,
+        country: String,
+        coordinates: {
+            latitude: Number,
+            longitude: Number
+        }
+    },
+    timezone: {
+        type: String,
+        default: 'Asia/Kolkata'
+    },
+    
+    // Professional Details
     specialization: {
         type: String
+    },
+    qualification: {
+        type: String
+    },
+    experience: {
+        type: Number // years of experience
     },
     feesPerSession: {
         type: String
     },
+    
+    // License & Verification
+    licenseNumber: {
+        type: String
+    },
+    issuingAuthority: {
+        type: String
+    },
+    licenseExpiryDate: {
+        type: Date
+    },
+    licenseDocument: {
+        type: String // path to uploaded document
+    },
+    verificationStatus: {
+        type: String,
+        enum: ['pending', 'verified', 'rejected', 'expired'],
+        default: 'pending'
+    },
+    verificationDate: {
+        type: Date
+    },
+    verificationNotes: {
+        type: String
+    },
+    
+    // Password Reset
+    passwordResetToken: {
+        type: String
+    },
+    passwordResetExpires: {
+        type: Date
+    },
+    
+    // Registration
+    registrationDate: {
+        type: Date,
+        default: Date.now
+    },
+    
+    // Appointments
     dates : [dateSchedule]
 });
 
